@@ -36,7 +36,12 @@ jobs:
         id: run-tests
         run: npm run test
       - name: Upload test report
-        if: steps.run-tests.outcome == 'failure'
+        # in "if:" condition we can skip/omit the ${{...}} annotation
+        # failure() Returns true when any previous Step or Job failed
+        # success() Returns true when none of the previous steps have failed
+        # always() Causes the step to always execute, even when cancelled
+        # cancelled() Returns true if the workflow has been cancelled
+        if: failure() && steps.run-tests.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
           name: test-report
