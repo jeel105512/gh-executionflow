@@ -2,14 +2,27 @@ name: Reusable Deploy
 # on: workflow_call
 on: 
   workflow_call:
+    # inputs that might be needed by this reusable workflow
+    # inputs can be added with the "with" key when re-using this workflow and using the same input name (e.g. artifact-name)
     inputs:
       artifact-name:
         description: The name of the deployable artifact files
         required: false
         default: dist
         type: string
+    # secrets that might be needed by this reusable workflow
+    # secrets can be added with the "secrets" key when re-using this workflow and using the same secret name (e.g. some-secret)
+    # secrets:
+    #   some-secret:
+    #     required: false
+    outputs:
+      result:
+        description: The result of the deployment operation
+        value: ${{ jobs.deploy.outputs.outcome }}
 jobs:
   deploy:
+    outputs:
+      outcome: ${{ steps.set-result.outputs.step-result }}
     runs-on: ubuntu-latest
     steps:
       - name: Get Code
@@ -20,3 +33,6 @@ jobs:
         run: ls
       - name: Output Information
         run: echo "Deploying & uploading..."
+      - name: Set result output
+        id: set-result
+        run: echo "step-result=success" >> $GITHUB_OUTPUT
