@@ -9,6 +9,15 @@ jobs:
         # it's a matrix because now actually this job will run for all combinations of these values
         node-version: [12, 14, 16]
         operating-system: [ubuntu-latest, windows-latest]
+        # "include" allows us to add additional single combinations with brand new keys which are not part of the matrix above
+        include:
+          - node-version: 18
+            operating-system: ubuntu-latest
+            # example: 369
+        # "exclude" allows us to exclude some combinations
+        exclude:
+          - node-version: 12
+            operating-system: windows-latest
     runs-on: ${{ matrix.operating-system }}
     steps:
       - name: Get Code
