@@ -1,4 +1,4 @@
-name: Website Deployment
+name: Continue Website Deployment
 on:
   push:
     branches:
@@ -13,12 +13,9 @@ jobs:
         id: cache
         uses: actions/cache@v3
         with:
-          # path: ~/.npm
-          # caching the node_modules folder instead of the global ~/.npm folder
           path: node_modules
           key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
       - name: Install dependencies
-        # with the help of this condition we are skipping the instellation of the node_modules if we are able to find/hit the cached node_modules
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
       - name: Lint code
@@ -38,6 +35,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
       - name: Test code
+        # continue on to the next step even if this step fails
         continue-on-error: true
         id: run-tests
         run: npm run test
