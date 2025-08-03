@@ -2,6 +2,7 @@ name: Matrix Demo
 on: push
 jobs:
   build:
+    continue-on-error: true
     # The idea behind a "matrix" simply is that you can run the same job with different configurations 
     strategy:
       matrix:
