@@ -13,9 +13,13 @@ jobs:
         id: cache
         uses: actions/cache@v3
         with:
-          path: ~/.npm
+          # path: ~/.npm
+          # caching the node_modules folder instead of the global ~/.npm folder
+          path: node_modules
           key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
       - name: Install dependencies
+        # with the help of this condition we are skipping the instellation of the node_modules if we are able to find/hit the cached node_modules
+        if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
       - name: Lint code
         run: npm run lint
@@ -28,9 +32,10 @@ jobs:
         id: cache
         uses: actions/cache@v3
         with:
-          path: ~/.npm
+          path: node_modules
           key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
       - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
       - name: Test code
         id: run-tests
@@ -56,9 +61,10 @@ jobs:
         id: cache
         uses: actions/cache@v3
         with:
-          path: ~/.npm
+          path: node_modules
           key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
       - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
       - name: Build website
         id: build-website
@@ -81,6 +87,7 @@ jobs:
       - name: Deploy
         run: echo "Deploying..."
   report:
+    # here in needs: [..., deploy], it will consider the whole chain of deploy, meaning all the jobs deploy needs or depends on 
     needs: [lint, deploy]
     if: failure()
     runs-on: ubuntu-latest
@@ -88,4 +95,4 @@ jobs:
       - name: Output information
         run: |
           echo "Something went wrong"
-          echo "${{ github }}"
+          echo "${{ toJSON(github) }}"
